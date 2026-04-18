@@ -79,25 +79,20 @@ composeApp/src/commonMain/kotlin/
 
 ## Screenshot
 
-### Loading State
-Ditampilkan saat aplikasi pertama dibuka atau saat data sedang dimuat ulang.
-
-*(tambahkan screenshot di sini)*
-
 ### Success State
 Daftar artikel berhasil dimuat dari JSONPlaceholder API.
 
-*(tambahkan screenshot di sini)*
+<img width="409" height="880" alt="Screenshot 2026-04-18 172804" src="https://github.com/user-attachments/assets/5419c610-4036-472a-93a2-1621c2fcacdc" />
 
 ### Error State
 Ditampilkan saat tidak ada koneksi internet, disertai tombol "Coba Lagi".
 
-*(tambahkan screenshot di sini)*
+<img width="396" height="857" alt="Screenshot 2026-04-18 172752" src="https://github.com/user-attachments/assets/62187026-6533-489e-9632-5171d6ea6a0c" />
 
 ### Detail Artikel
 Tampilan lengkap artikel setelah item di-klik dari daftar.
 
-*(tambahkan screenshot di sini)*
+<img width="411" height="886" alt="Screenshot 2026-04-18 172811" src="https://github.com/user-attachments/assets/7f7fc5d4-1687-4824-8a90-283207b95650" />
 
 ---
 
@@ -109,3 +104,7 @@ Tampilan lengkap artikel setelah item di-klik dari daftar.
 | Success | Biarkan data termuat dengan koneksi normal |
 | Error | Aktifkan Airplane Mode, lalu tekan tombol Retry |
 | Pull to Refresh | Tarik layar ke bawah pada daftar artikel |
+
+## Video Demo
+
+https://github.com/user-attachments/assets/e966488b-abdf-4db7-a09c-b178616c0213
