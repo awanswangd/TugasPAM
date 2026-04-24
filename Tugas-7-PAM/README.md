@@ -145,6 +145,7 @@ Menampilkan daftar semua catatan dengan UI states: Loading, Empty, dan Content.
 Form untuk menambahkan atau mengedit catatan.
 
 <img width="434" height="970" alt="Screenshot 2026-04-24 184846" src="https://github.com/user-attachments/assets/56266b6e-888f-445e-a678-b5256d2007c6" /> 
+
 ---
 
 ### 3. Search Notes
