@@ -137,35 +137,35 @@ composeApp/src/
 ### 1. Notes List Screen
 Menampilkan daftar semua catatan dengan UI states: Loading, Empty, dan Content.
 
-(masukkan media disini — Screenshot Notes List Screen: kondisi loading, empty state, dan list notes)
+<img width="438" height="972" alt="Screenshot 2026-04-24 184826" src="https://github.com/user-attachments/assets/18fe1d82-609d-4f7b-bbe7-d1491ae69a3f" />
 
 ---
 
 ### 2. Add / Edit Note Screen
 Form untuk menambahkan atau mengedit catatan.
 
-(masukkan media disini — Screenshot Add Note Screen dan Edit Note Screen)
+<img width="434" height="970" alt="Screenshot 2026-04-24 184846" src="https://github.com/user-attachments/assets/56266b6e-888f-445e-a678-b5256d2007c6" /> 
 
 ---
 
 ### 3. Search Notes
 Fitur pencarian yang memfilter notes berdasarkan judul atau konten secara real-time.
 
-(masukkan media disini — Screenshot Search Notes: hasil pencarian dengan keyword tertentu)
+<img width="434" height="971" alt="Screenshot 2026-04-24 184858" src="https://github.com/user-attachments/assets/5c6bf404-6892-40bd-ae1e-ca9f39e35827" />
 
 ---
 
 ### 4. Settings Screen
 Halaman pengaturan menggunakan DataStore. Tersedia pilihan tema dan sort order.
 
-(masukkan media disini — Screenshot Settings Screen: toggle tema dan opsi sort order)
+<img width="455" height="983" alt="Screenshot 2026-04-24 184903" src="https://github.com/user-attachments/assets/66962938-82ad-4a74-98c6-2186464e3c9a" />
 
 ---
 
 ### 5. Offline Mode
 Demonstrasi aplikasi tetap berfungsi saat mode pesawat / tanpa koneksi internet.
 
-(masukkan media disini — Screenshot offline mode: data tetap tampil dari local DB)
+<img width="461" height="932" alt="Screenshot 2026-04-24 185614" src="https://github.com/user-attachments/assets/9c0acb49-36da-4f55-88fb-d8c699b196b5" />
 
 ---
 
@@ -181,43 +181,8 @@ Video demo berdurasi kurang dari 45 detik menunjukkan alur berikut:
 - Mengubah tema di Settings
 - Membuka aplikasi dalam kondisi offline — data tetap muncul
 
-(masukkan media disini — link atau file video demo, maks. 45 detik)
 
----
-
-## Rubrik Penilaian
-
-| Komponen | Bobot | Kriteria |
-|---|---|---|
-| SQLDelight Setup | 20% | Schema, queries, driver setup |
-| CRUD Operations | 25% | All operations work correctly |
-| DataStore Settings | 15% | Preferences saved and applied |
-| Search Feature | 15% | Search works properly |
-| UI/UX | 15% | Clean UI, proper states |
-| Code Quality | 10% | Clean code, documentation |
-| **Bonus** | **+10%** | **Sync dengan remote API** |
-
-> ⚠️ Penalti: Terlambat **-10%/hari** | Plagiat: **nilai 0**
-
----
-
-## Checklist Pengerjaan
-
-- [ ] Setup SQLDelight plugin di `build.gradle.kts`
-- [ ] Menulis schema `Note.sq` dengan 6 queries (selectAll, selectById, insert, update, delete, search)
-- [ ] Implementasi `DatabaseDriverFactory` (expect/actual) untuk Android dan iOS
-- [ ] Implementasi `NoteRepository` dengan Flow
-- [ ] Implementasi `NotesViewModel` dengan StateFlow
-- [ ] Setup multiplatform-settings untuk DataStore
-- [ ] Implementasi `SettingsManager` (theme + sort order)
-- [ ] Implementasi `SettingsViewModel`
-- [ ] Notes List Screen dengan UI states (loading, empty, content)
-- [ ] Add/Edit Note Screen dengan form input
-- [ ] Search functionality
-- [ ] Settings Screen dengan pilihan tema dan sort order
-- [ ] Push ke GitHub branch: `week-7`
-- [ ] README dengan database schema dan screenshot
-- [ ] Video demo 45 detik
+https://github.com/user-attachments/assets/dba61f60-5c0a-4ca1-9ae5-b6083ae9f6d1
 
 ---
 
