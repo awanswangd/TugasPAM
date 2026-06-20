@@ -1,69 +1,15 @@
-# README — Tugas Praktikum Minggu 7
-## Local Data Storage — DataStore & SQLDelight
+# Tugas Praktikum Minggu 10 - Testing dan Dependency Injection
+
+**Mata Kuliah:** Pengembangan Aplikasi Mobile (IF25-22017)  
+**Nama:** M. Hafizurrahman Akbar  
+**NIM:** 123140123  
+**Branch:** week-10
 
 ---
 
-## Identitas Mahasiswa
+## Deskripsi
 
-| | |
-|---|---|
-| **Nama** | M. Hafizurrahman Akbar |
-| **NIM** | 123140123 |
-| **Mata Kuliah** | IF25-22017 Pengembangan Aplikasi Mobile |
-| **Pertemuan** | 7 — Local Data Storage |
-| **Program Studi** | Teknik Informatika — Institut Teknologi Sumatera |
-| **Tahun Akademik** | Genap 2025/2026 |
-| **Branch GitHub** | `week-7` |
-
----
-
-## Deskripsi Tugas
-
-Tugas praktikum minggu 7 adalah mengembangkan aplikasi **Notes App** menggunakan Kotlin Multiplatform (KMP) dengan Compose Multiplatform. Aplikasi mengimplementasikan penyimpanan data lokal menggunakan **SQLDelight** untuk database dan **DataStore** (multiplatform-settings) untuk pengaturan/preferences aplikasi.
-
-### Fitur yang Diimplementasikan
-
-- SQLDelight database untuk menyimpan notes secara lokal
-- CRUD Operations: Create, Read, Update, Delete notes
-- Search functionality untuk mencari notes berdasarkan judul atau konten
-- Settings screen dengan DataStore: pilihan tema (light/dark/system) dan sort order
-- Offline-first: semua data tersimpan lokal, tersedia tanpa koneksi internet
-- UI States yang proper: Loading, Empty, Content
-
----
-
-## Database Schema
-
-File: `src/commonMain/sqldelight/com/example/notes/db/Note.sq`
-
-```sql
-CREATE TABLE Note (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    title      TEXT    NOT NULL,
-    content    TEXT    NOT NULL,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-);
-
-selectAll:
-SELECT * FROM Note ORDER BY updated_at DESC;
-
-selectById:
-SELECT * FROM Note WHERE id = ?;
-
-insert:
-INSERT INTO Note(title, content, created_at, updated_at)
-VALUES (?, ?, ?, ?);
-
-update:
-UPDATE Note SET title = ?, content = ?, updated_at = ? WHERE id = ?;
-
-delete:
-DELETE FROM Note WHERE id = ?;
-
-search:
-SELECT * FROM Note WHERE title LIKE ? OR content LIKE ?;
-```
+Implementasi Dependency Injection (Koin) dan Testing (Unit Test, Flow Test, UI Test) untuk Notes App berbasis Kotlin Multiplatform (KMP).
 
 ---
 
@@ -71,165 +17,163 @@ SELECT * FROM Note WHERE title LIKE ? OR content LIKE ?;
 
 ```
 composeApp/src/
-├── commonMain/
-│   ├── kotlin/
-│   │   ├── data/
-│   │   │   ├── local/
-│   │   │   │   ├── DatabaseDriverFactory.kt   (expect)
-│   │   │   │   └── NoteRepository.kt
-│   │   │   └── settings/
-│   │   │       └── SettingsManager.kt
-│   │   └── ui/
-│   │       ├── notes/
-│   │       │   ├── NotesListScreen.kt
-│   │       │   ├── AddEditNoteScreen.kt
-│   │       │   └── NotesViewModel.kt
-│   │       └── settings/
-│   │           ├── SettingsScreen.kt
-│   │           └── SettingsViewModel.kt
-│   └── sqldelight/
-│       └── com/example/notes/db/
-│           └── Note.sq
+├── commonMain/kotlin/com/example/notesapp/
+│   ├── data/
+│   │   └── repository/
+│   │       └── NoteRepositoryImpl.kt       # Implementasi repository (in-memory)
+│   ├── domain/
+│   │   ├── model/
+│   │   │   └── Note.kt                     # Data model
+│   │   ├── repository/
+│   │   │   └── NoteRepository.kt           # Interface repository
+│   │   └── usecase/
+│   │       └── NoteValidator.kt            # Validasi note
+│   ├── di/
+│   │   ├── AppModule.kt                    # Koin modules (dataModule, domainModule, viewModelModule)
+│   │   └── KoinInitializer.kt              # initKoin() function
+│   ├── ui/
+│   │   ├── screens/notes/
+│   │   │   └── NotesScreen.kt              # Composable dengan TestTags
+│   │   └── viewmodel/
+│   │       ├── NotesUiState.kt             # UI state sealed class
+│   │       └── NotesViewModel.kt           # ViewModel dengan DI
+│   └── util/
+│       └── TestTags.kt                     # Konstanta test tags
 ├── androidMain/
-│   └── kotlin/.../DatabaseDriverFactory.android.kt
-└── iosMain/
-    └── kotlin/.../DatabaseDriverFactory.ios.kt
+│   └── MainActivity.kt                     # initKoin() dipanggil di onCreate
+├── commonTest/kotlin/com/example/notesapp/
+│   ├── NoteValidatorTest.kt                # Unit test validator (9 test cases)
+│   ├── NoteRepositoryTest.kt               # Unit test repository (10 test cases)
+│   ├── NoteRepositoryFlowTest.kt           # Flow test dengan Turbine (4 test cases)
+│   ├── NotesViewModelTest.kt               # ViewModel test dengan MockK (8 test cases)
+│   └── KoinModuleTest.kt                   # Koin module verification
+└── androidUnitTest/kotlin/
+    └── NotesScreenTest.kt                  # UI test Compose (7 test cases)
 ```
 
 ---
 
-## Dependencies
+## Implementasi Koin DI
 
-| Library | Versi | Fungsi |
-|---|---|---|
-| `app.cash.sqldelight` | 2.0.1 | Database SQLite multiplatform |
-| `multiplatform-settings` | 1.1.1 | Key-value storage (DataStore KMP) |
-| `multiplatform-settings-coroutines` | 1.1.1 | Flow support untuk settings |
-| `sqldelight:coroutines-extensions` | 2.0.1 | Flow support untuk SQLDelight |
-| `kotlinx-datetime` | 0.5.0 | Timestamp (epoch milliseconds) |
+### Modules yang dibuat:
 
----
+```kotlin
+// dataModule - Data layer
+val dataModule = module {
+    single<NoteRepository> { NoteRepositoryImpl() }
+}
 
-## Cara Menjalankan Aplikasi
+// domainModule - Domain layer
+val domainModule = module {
+    factory { NoteValidator() }
+}
 
-### Prasyarat
+// viewModelModule - UI layer
+val viewModelModule = module {
+    viewModel { NotesViewModel(get(), get()) }
+}
+```
 
-- Android Studio Hedgehog atau lebih baru
-- Kotlin 1.9.x atau lebih baru
-- Xcode 15+ (untuk build iOS)
-- JDK 17
-
-### Langkah-langkah
-
-1. Clone repository:
-   ```bash
-   git clone <URL_REPOSITORY>
-   git checkout week-7
-   ```
-2. Buka project di Android Studio
-3. Jalankan Gradle Sync — **File > Sync Project with Gradle Files**
-4. Build dan jalankan di emulator/device pilihan
+### Cara inisialisasi (MainActivity.kt):
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    initKoin()
+    // ...
+}
+```
 
 ---
 
-## Screenshot Aplikasi
+## Daftar Test Cases
 
-### 1. Notes List Screen
-Menampilkan daftar semua catatan dengan UI states: Loading, Empty, dan Content.
+### NoteValidatorTest (9 test cases)
+| No | Test | Expected |
+|----|------|----------|
+| 1 | valid note with title and content | returns true |
+| 2 | empty title | returns false |
+| 3 | blank title (spaces) | returns false |
+| 4 | title exactly at limit (200 chars) | returns true |
+| 5 | title exceeding limit (201 chars) | returns false |
+| 6 | valid note with empty content | returns true |
+| 7 | validate throws for empty title | throws ValidationException |
+| 8 | validate throws for title too long | throws ValidationException |
+| 9 | validate does not throw for valid note | no exception |
 
-(masukkan media disini — Screenshot Notes List Screen: kondisi loading, empty state, dan list notes)
+### NoteRepositoryTest (10 test cases)
+| No | Test | Expected |
+|----|------|----------|
+| 1 | getAllNotes initially | emits empty list |
+| 2 | insertNote | adds note |
+| 3 | insertNote | returns assigned id |
+| 4 | insertNote multiple | assigns unique ids |
+| 5 | getNoteById | returns correct note |
+| 6 | getNoteById non-existent | returns null |
+| 7 | updateNote | modifies existing note |
+| 8 | deleteNote | removes from list |
+| 9 | deleteAllNotes | clears all notes |
+| 10 | getAllNotes after insert | emits updated list |
 
----
+### NoteRepositoryFlowTest (4 test cases - Turbine)
+| No | Test |
+|----|------|
+| 1 | emits empty then updates on insert |
+| 2 | emits updated list after delete |
+| 3 | emits multiple times on multiple inserts |
+| 4 | emits empty after deleteAll |
 
-### 2. Add / Edit Note Screen
-Form untuk menambahkan atau mengedit catatan.
+### NotesViewModelTest (8 test cases - MockK)
+| No | Test |
+|----|------|
+| 1 | initial state transitions from loading to success |
+| 2 | uiState emits success with notes from repository |
+| 3 | addNote calls repository insertNote |
+| 4 | addNote with empty title does not call repository |
+| 5 | deleteNote calls repository with correct id |
+| 6 | updateNote calls repository updateNote |
+| 7 | deleteAllNotes calls repository |
+| 8 | error from repository emits error state |
 
-(masukkan media disini — Screenshot Add Note Screen dan Edit Note Screen)
-
----
-
-### 3. Search Notes
-Fitur pencarian yang memfilter notes berdasarkan judul atau konten secara real-time.
-
-(masukkan media disini — Screenshot Search Notes: hasil pencarian dengan keyword tertentu)
-
----
-
-### 4. Settings Screen
-Halaman pengaturan menggunakan DataStore. Tersedia pilihan tema dan sort order.
-
-(masukkan media disini — Screenshot Settings Screen: toggle tema dan opsi sort order)
-
----
-
-### 5. Offline Mode
-Demonstrasi aplikasi tetap berfungsi saat mode pesawat / tanpa koneksi internet.
-
-(masukkan media disini — Screenshot offline mode: data tetap tampil dari local DB)
-
----
-
-## Video Demo
-
-Video demo berdurasi kurang dari 45 detik menunjukkan alur berikut:
-
-- Menambahkan note baru (Create)
-- Melihat daftar notes (Read)
-- Mengedit note yang sudah ada (Update)
-- Menghapus note (Delete)
-- Mencari note dengan keyword (Search)
-- Mengubah tema di Settings
-- Membuka aplikasi dalam kondisi offline — data tetap muncul
-
-(masukkan media disini — link atau file video demo, maks. 45 detik)
-
----
-
-## Rubrik Penilaian
-
-| Komponen | Bobot | Kriteria |
-|---|---|---|
-| SQLDelight Setup | 20% | Schema, queries, driver setup |
-| CRUD Operations | 25% | All operations work correctly |
-| DataStore Settings | 15% | Preferences saved and applied |
-| Search Feature | 15% | Search works properly |
-| UI/UX | 15% | Clean UI, proper states |
-| Code Quality | 10% | Clean code, documentation |
-| **Bonus** | **+10%** | **Sync dengan remote API** |
-
-> ⚠️ Penalti: Terlambat **-10%/hari** | Plagiat: **nilai 0**
+### NotesScreenTest (7 test cases - Compose UI Test)
+| No | Test |
+|----|------|
+| 1 | empty state shows message when no notes |
+| 2 | notes list displayed when notes exist |
+| 3 | add button displayed and clickable |
+| 4 | typing in title input updates text field |
+| 5 | clicking add button calls onAddNote |
+| 6 | loading indicator shown when loading |
+| 7 | error message shown when error |
 
 ---
 
-## Checklist Pengerjaan
+## Cara Menjalankan Test
 
-- [ ] Setup SQLDelight plugin di `build.gradle.kts`
-- [ ] Menulis schema `Note.sq` dengan 6 queries (selectAll, selectById, insert, update, delete, search)
-- [ ] Implementasi `DatabaseDriverFactory` (expect/actual) untuk Android dan iOS
-- [ ] Implementasi `NoteRepository` dengan Flow
-- [ ] Implementasi `NotesViewModel` dengan StateFlow
-- [ ] Setup multiplatform-settings untuk DataStore
-- [ ] Implementasi `SettingsManager` (theme + sort order)
-- [ ] Implementasi `SettingsViewModel`
-- [ ] Notes List Screen dengan UI states (loading, empty, content)
-- [ ] Add/Edit Note Screen dengan form input
-- [ ] Search functionality
-- [ ] Settings Screen dengan pilihan tema dan sort order
-- [ ] Push ke GitHub branch: `week-7`
-- [ ] README dengan database schema dan screenshot
-- [ ] Video demo 45 detik
+```bash
+# Unit tests (commonTest)
+./gradlew :composeApp:allTests
+
+# Android instrumented tests (UI test)
+./gradlew :composeApp:connectedAndroidTest
+
+# Specific test class
+./gradlew :composeApp:testDebugUnitTest --tests "*.NoteValidatorTest"
+```
 
 ---
 
-## Referensi
+## Dependencies yang ditambahkan
 
-- [SQLDelight Official Documentation](https://cashapp.github.io/sqldelight)
-- [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings)
-- [Android DataStore](https://developer.android.com/topic/libraries/architecture/datastore)
-- [Offline-First Apps](https://developer.android.com/topic/architecture/data-layer/offline-first)
-- [SQLDelight KMP Tutorial](https://kotlinlang.org/docs/multiplatform-mobile-ktor-sqldelight.html)
-- [Repository Pattern](https://developer.android.com/topic/architecture/data-layer)
+```kotlin
+// Koin DI
+implementation("io.insert-koin:koin-core:3.5.3")
+implementation("io.insert-koin:koin-compose:1.1.2")
+implementation("io.insert-koin:koin-compose-viewmodel:1.1.2")
 
----
-
-*Institut Teknologi Sumatera — Program Studi Teknik Informatika — TA Genap 2025/2026*
+// Testing
+implementation(kotlin("test"))
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+implementation("app.cash.turbine:turbine:1.0.0")  // Flow testing
+implementation("io.mockk:mockk:1.13.9")             // Mocking (JVM)
+implementation("io.insert-koin:koin-test:3.5.3")   // Koin testing
+```
